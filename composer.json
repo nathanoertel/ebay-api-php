@@ -1,0 +1,18 @@
+{
+	"name": "digitalclouddesigns/ebay-api-php",
+	"description": "PHP library for eBay APIs",
+	"type": "library",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Nathan Oertel",
+			"email": "nathan@digitalclouddesigns.com"
+		}
+	],
+	"minimum-stability": "stable",
+	"autoload": {
+		"psr-4": {
+			"eBayAPI\\": "src/"
+		}
+	}
+}
