@@ -23,7 +23,11 @@ class AccessToken {
 
     private $expires;
 
+    private $scopes;
+
     private $updated = false;
+
+    private $updateCallback;
 
     public function getAccessToken() {
         return $this->accessToken;
@@ -37,6 +41,10 @@ class AccessToken {
         return $this->expires;
     }
 
+    public function getScopes() {
+        return $this->scopes;
+    }
+
     public function isExpired() {
         return $this->expires < time();
     }
@@ -44,6 +52,8 @@ class AccessToken {
     public function setToken($accessToken, $expires) {
         $this->accessToken = $accessToken;
         $this->expires = $expires;
+        $updateCallback = $this->updateCallback;
+        $updateCallback($this);
         $this->updated = true;
     }
 
@@ -51,10 +61,12 @@ class AccessToken {
         return $this->updated;
     }
 
-    public function __construct($accessToken, $refreshToken, $expires) {
+    public function __construct($accessToken, $refreshToken, $expires, $scopes, $updateCallback) {
         $this->accessToken = $accessToken;
         $this->refreshToken = $refreshToken;
         $this->expires = $expires;
+        $this->scopes = $scopes;
+        $this->updateCallback = $updateCallback;
     }
 }
 ?>

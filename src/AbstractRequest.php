@@ -23,16 +23,22 @@ abstract class AbstractRequest {
     const DELETE = 'DELETE';
 
     /**
-     * The configuration object
-     * @var eBayAPI\Credentials $credentials
-     */
-    protected $configuration;
-
-    /**
      * The environment object
-     * @var eBayAPI\Environment $environment
+     * @var eBayAPI\model\Environment $environment
      */
     protected $environment;
+
+    /**
+     * The application credentials
+     * @var eBayAPI\model\Credentials $credentials
+     */
+    protected $credentials;
+
+    /**
+     * The user access token
+     * @var eBayAPI\model\AccessToken $accessToken
+     */
+    protected $accessToken;
 
     /**
      * The PSR-3 compatible logging interface
@@ -85,10 +91,9 @@ abstract class AbstractRequest {
 		curl_setopt_array($curl, $options);
 
         $response = curl_exec($curl);
+        $exception = null;
 
 		if($response !== false) {
-			if($this->logger) $this->log($response);
-			
 			$headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
 
 			$headers = substr($response, 0, $headerSize);
@@ -106,28 +111,59 @@ abstract class AbstractRequest {
             }
             
             $response = json_decode(gzdecode($body), true);
+
+            $this->log($headers);
+            $this->log(json_encode($response, JSON_PRETTY_PRINT));
     
-            if(isset($response['Error'])) {
-                throw new exception\RequestException($response['Error']);
+            if(isset($response['errors'])) {
+                $notHandled = true;
+
+                if($httpCode == 401) {
+                    foreach($response['errors'] as $error) { 
+                        if($error['errorId'] == 1001) {
+                            $notHandled = false;
+                            if($this->refreshToken()) {
+                                $response = $this->request($path, $method, $data);
+                            } else $exception = new exception\AuthenticationException('Refresh token failed');
+                            break;
+                        }
+                    }
+                }
+
+                if($notHandled) {
+                    $errors = array();
+                    foreach($response['errors'] as $error) { 
+                        $errors[] = $error['message'];
+                    }
+                    $exception = new exception\RequestException(implode("\n", $errors));
+                }
             } else if($httpCode != 200) {
-                throw new exception\RequestException('Unknown Error: '.$httpCode);
-			} else {
-                return $response;
+                $exception = new exception\RequestException('Unknown Error: '.$httpCode);
             }
 		} else {
-            if($this->logger) $this->log(curl_error($curl));
-            throw new exception\RequestException('Unknown Curl Error: '.curl_errno($curl));
+            $this->log(curl_error($curl));
+            $exception = new exception\RequestException('Unknown Curl Error: '.curl_errno($curl));
 		}
 		
-		curl_close($curl);
+        curl_close($curl);
+        
+        if($exception) throw $exception;
+        else return $response;
     }
 
     private function getAuthorization($path) {
         return $this->accessToken->getAccessToken();
     }
 
-    public function __construct(model\Environment $environment, model\AccessToken $accessToken, $logger = null) {
+    private function refreshToken() {
+        $oath2API = new OAuth2API($this->environment, $this->credentials, $this->logger);
+
+        return $oath2API->refreshToken($this->accessToken);
+    }
+
+    public function __construct(model\Environment $environment, model\Credentials $credentials, model\AccessToken $accessToken, $logger = null) {
         $this->environment = $environment;
+        $this->credentials = $credentials;
         $this->accessToken = $accessToken;
         $this->logger = $logger;
     }

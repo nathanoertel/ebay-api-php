@@ -22,4 +22,20 @@ class CategoryRequest extends AbstractRequest {
             'marketplace_id' => $marketplaceId
         ));
     }
+
+    public function getCategoryTree($categoryTreeId) {
+        return parent::get('/commerce/taxonomy/v1_beta/category_tree/'.$categoryTreeId);
+    }
+
+    public function getCategorySubtree($categoryTreeId, $categoryId) {
+        return parent::get('/commerce/taxonomy/v1_beta/category_tree/'.$categoryTreeId.'/get_category_subtree', array(
+            'category_id' => $categoryId
+        ));
+    }
+
+    public function getItemAspectsForCategory($categoryTreeId, $categoryId) {
+        return parent::get('/commerce/taxonomy/v1_beta/category_tree/'.$categoryTreeId.'/get_item_aspects_for_category', array(
+            'category_id' => $categoryId
+        ));
+    }
 }
