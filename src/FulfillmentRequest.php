@@ -28,4 +28,16 @@ class FulfillmentRequest extends AbstractRequest {
     public function issueRefund($orderId, $refund) {
         return parent::post('/sell/fulfillment/v1/order/'.$orderId.'/issue_refund', $refund);
     }
+
+    public function getShippingFulfillments($orderId) {
+        return parent::get('/sell/fulfillment/v1/order/'.$orderId.'/shipping_fulfillment');
+    }
+
+    public function getShippingFulfillment($orderId, $shippingFulfillmentId) {
+        return parent::get('/sell/fulfillment/v1/order/'.$orderId.'/shipping_fulfillment/'.$shippingFulfillmentId);
+    }
+
+    public function createShippingFulfillment($orderId, $shippingFulfillment) {
+        return parent::post('/sell/fulfillment/v1/order/'.$orderId.'/shipping_fulfillment', $shippingFulfillment);
+    }
 }

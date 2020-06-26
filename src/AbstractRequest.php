@@ -135,14 +135,23 @@ abstract class AbstractRequest {
                     foreach($response['errors'] as $error) { 
                         $errors[] = $error['message'];
                     }
-                    $exception = new exception\RequestException(implode("\n", $errors));
+                    $exception = new exception\RequestException($response['errors']);
                 }
             } else if($httpCode != 200) {
-                $exception = new exception\RequestException('Unknown Error: '.$httpCode);
+                $exception = new exception\RequestException(array(
+                    array(
+                        'errorId' => $httpCode,
+                        'message' => 'Unknown Error: '.$httpCode
+                    )
+                ));
             }
 		} else {
-            $this->log(curl_error($curl));
-            $exception = new exception\RequestException('Unknown Curl Error: '.curl_errno($curl));
+            $exception = new exception\RequestException(array(
+                array(
+                    'errorId' => curl_errno($curl),
+                    'message' => curl_error($curl)
+                )
+            ));
 		}
 		
         curl_close($curl);
