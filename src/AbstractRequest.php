@@ -50,8 +50,16 @@ abstract class AbstractRequest {
         return $this->request($path, AbstractRequest::GET, $params);
     }
 
+    public function put($path, $data = array()) {
+        return $this->request($path, AbstractRequest::PUT, $data);
+    }
+
     public function post($path, $data = array()) {
         return $this->request($path, AbstractRequest::POST, $data);
+    }
+
+    public function delete($path, $data = array()) {
+        return $this->request($path, AbstractRequest::DELETE, $data);
     }
 
     private function request($path, $method, $data) {
@@ -64,7 +72,8 @@ abstract class AbstractRequest {
 		    	'Accept: application/json',
                 'Authorization: Bearer '.$this->getAuthorization($path),
                 'Content-Type: application/json',
-                'Accept-Encoding: application/gzip'
+                'Accept-Encoding: application/gzip',
+                'Content-Language: en-US'
 		    ),
 		    CURLOPT_HEADER => 1,
 		    CURLOPT_RETURNTRANSFER => 1
@@ -110,7 +119,8 @@ abstract class AbstractRequest {
                 }
             }
             
-            $response = json_decode(gzdecode($body), true);
+            if(empty($body)) $response = null;
+            else $response = json_decode(gzdecode($body), true);
 
             $this->log($headers);
             $this->log(json_encode($response, JSON_PRETTY_PRINT));
@@ -128,6 +138,12 @@ abstract class AbstractRequest {
                             break;
                         }
                     }
+                } else if(
+                    ($method == AbstractRequest::GET || $method == AbstractRequest::DELETE)
+                    && $httpCode == 404
+                ) { // if it's a lookup and it's not found return null
+                    $response = null;
+                    $notHandled = false;
                 }
 
                 if($notHandled) {
@@ -137,13 +153,6 @@ abstract class AbstractRequest {
                     }
                     $exception = new exception\RequestException($response['errors']);
                 }
-            } else if($httpCode != 200) {
-                $exception = new exception\RequestException(array(
-                    array(
-                        'errorId' => $httpCode,
-                        'message' => 'Unknown Error: '.$httpCode
-                    )
-                ));
             }
 		} else {
             $exception = new exception\RequestException(array(
