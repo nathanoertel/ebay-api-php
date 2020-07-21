@@ -108,116 +108,18 @@ abstract class AbstractSOAPRequest {
 
             return $resp;
         } catch(\SoapException $e) {
-            error_log($client->__getLastRequestHeaders());
             $this->log($client->__getLastRequestHeaders());
             $this->log($client->__getLastRequest());
             $this->log($client->__getLastResponseHeaders());
             $this->log($client->__getLastResponse());
             throw $e;
         } catch(\Exception $e) {
-            error_log($client->__getLastRequestHeaders());
             $this->log($client->__getLastRequestHeaders());
             $this->log($client->__getLastRequest());
             $this->log($client->__getLastResponseHeaders());
             $this->log($client->__getLastResponse());
             throw $e;
         }
-        // $curl = curl_init();
-        
-        // $soap = SOAP('https://developer.ebay.com/webservices/latest/ebaysvc.wsdl');
-
-		// $options = array(
-		//     CURLOPT_RETURNTRANSFER => 1,
-		//     CURLOPT_URL => 'https://'.$this->environment->getAPIEndpoint().$path,
-		//     CURLOPT_HTTPHEADER => array(
-		//     	'Accept: application/json',
-        //         'Authorization: Bearer '.$this->getAuthorization($path),
-        //         'Content-Type: application/json',
-        //         'Accept-Encoding: application/gzip'
-		//     ),
-		//     CURLOPT_HEADER => 1,
-		//     CURLOPT_RETURNTRANSFER => 1
-        // );
-        
-		// if($method == AbstractRequest::GET) {
-		// 	if(!empty($data)) $options[CURLOPT_URL] .= '?'.http_build_query($data);
-		// 	$this->log('GET '.$options[CURLOPT_URL]);
-		// } else if($method == AbstractRequest::PUT) {
-		// 	$options[CURLOPT_CUSTOMREQUEST] = 'PUT';
-		//     $options[CURLOPT_POSTFIELDS] = json_encode($data);
-        //     $this->log('UPDATE '.$options[CURLOPT_URL]);
-        //     $this->log($options[CURLOPT_POSTFIELDS]);
-		// } else if($method == AbstractRequest::POST) {
-		// 	$options[CURLOPT_POST] = 1;
-		//     $options[CURLOPT_POSTFIELDS] = json_encode($data);
-        //     $this->log('POST '.$options[CURLOPT_URL]);
-        //     $this->log($options[CURLOPT_POSTFIELDS]);
-		// } else if($method == AbstractRequest::DELETE) {
-		// 	$options[CURLOPT_CUSTOMREQUEST] = 'DELETE';
-		// 	$this->log('DELETE '.$options[CURLOPT_URL]);
-		// }
-		
-		// curl_setopt_array($curl, $options);
-
-        // $response = curl_exec($curl);
-        // $exception = null;
-
-		// if($response !== false) {
-		// 	$headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
-
-		// 	$headers = substr($response, 0, $headerSize);
-		// 	$body = substr($response, $headerSize);
-			
-		// 	$headerArray = explode("\r\n", $headers);
-        //     $httpCode = 500;
-            
-        //     foreach($headerArray as $index => $header) {
-        //         if(strpos($header, 'HTTP/') === 0) {
-        //             list($httpType, $httpCode, $status) = explode(' ', $header);
-        //             $httpCode = intval($httpCode);
-        //             break;
-        //         }
-        //     }
-            
-        //     $response = json_decode(gzdecode($body), true);
-
-        //     $this->log($headers);
-        //     $this->log(json_encode($response, JSON_PRETTY_PRINT));
-    
-        //     if(isset($response['errors'])) {
-        //         $notHandled = true;
-
-        //         if($httpCode == 401) {
-        //             foreach($response['errors'] as $error) { 
-        //                 if($error['errorId'] == 1001) {
-        //                     $notHandled = false;
-        //                     if($this->refreshToken()) {
-        //                         $response = $this->request($path, $method, $data);
-        //                     } else $exception = new exception\AuthenticationException('Refresh token failed');
-        //                     break;
-        //                 }
-        //             }
-        //         }
-
-        //         if($notHandled) {
-        //             $errors = array();
-        //             foreach($response['errors'] as $error) { 
-        //                 $errors[] = $error['message'];
-        //             }
-        //             $exception = new exception\RequestException(implode("\n", $errors));
-        //         }
-        //     } else if($httpCode != 200) {
-        //         $exception = new exception\RequestException('Unknown Error: '.$httpCode);
-        //     }
-		// } else {
-        //     $this->log(curl_error($curl));
-        //     $exception = new exception\RequestException('Unknown Curl Error: '.curl_errno($curl));
-		// }
-		
-        // curl_close($curl);
-        
-        // if($exception) throw $exception;
-        // else return $response;
     }
 
     private function getAuthorization() {

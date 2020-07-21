@@ -123,7 +123,7 @@ abstract class AbstractRequest {
             else $response = json_decode(gzdecode($body), true);
 
             $this->log($headers);
-            $this->log(json_encode($response, JSON_PRETTY_PRINT));
+            $this->log(json_encode($response));
     
             if(isset($response['errors'])) {
                 $notHandled = true;

@@ -17,6 +17,27 @@
 namespace eBayAPI;
 
 class StoreRequest extends AbstractSOAPRequest {
+    public function getAccount($marketplaceId) {
+        return parent::request('GetAccount', $marketplaceId);
+    }
+
+    public function relistFixedPriceItem($marketplaceId, $itemId) {
+        return parent::request('RelistFixedPriceItem', $marketplaceId, array(
+            'Item' => array(
+                'ItemID' => $itemId
+            )
+        ));
+    }
+
+    public function reviseInventoryStatus($marketplaceId, $itemId, $quantity) {
+        return parent::request('ReviseInventoryStatus', $marketplaceId, array(
+            'InventoryStatus' => array(
+                'ItemID' => $itemId,
+                'Quantity' => $quantity
+            )
+        ));
+    }
+
     public function getStore($marketplaceId, $data) {
         return parent::request('GetStore', $marketplaceId, $data);
     }
