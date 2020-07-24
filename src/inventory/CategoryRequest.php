@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace eBayAPI;
+namespace eBayAPI\inventory;
 
 class CategoryRequest extends AbstractRequest {
     public function getDefaultCategoryTreeId($marketplaceId) {

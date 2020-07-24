@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace eBayAPI;
+namespace eBayAPI\trading;
 
-abstract class AbstractSOAPRequest {
+abstract class AbstractRequest {
     const GET = 'GET';
     const POST = 'POST';
     const PUT = 'PUT';
@@ -108,17 +108,28 @@ abstract class AbstractSOAPRequest {
 
             return $resp;
         } catch(\SoapException $e) {
+            echo "SOAP EXCEPTION\n";
+            echo $e->getMessage()."\n";
+            echo $e->getCode()."\n";
             $this->log($client->__getLastRequestHeaders());
             $this->log($client->__getLastRequest());
             $this->log($client->__getLastResponseHeaders());
             $this->log($client->__getLastResponse());
             throw $e;
         } catch(\Exception $e) {
-            $this->log($client->__getLastRequestHeaders());
-            $this->log($client->__getLastRequest());
-            $this->log($client->__getLastResponseHeaders());
-            $this->log($client->__getLastResponse());
-            throw $e;
+            echo "EXCEPTION\n";
+            echo $e->getMessage()."\n";
+            echo $e->getCode()."\n";
+            if($e->getMessage() == 'Expired IAF token.') {
+                $this->refreshToken();
+                return $this->request($operation, $marketplaceId, $data);
+            } else {
+                $this->log($client->__getLastRequestHeaders());
+                $this->log($client->__getLastRequest());
+                $this->log($client->__getLastResponseHeaders());
+                $this->log($client->__getLastResponse());
+                throw $e;
+            }
         }
     }
 
@@ -127,12 +138,12 @@ abstract class AbstractSOAPRequest {
     }
 
     private function refreshToken() {
-        $oath2API = new OAuth2API($this->environment, $this->credentials, $this->logger);
+        $oath2API = new \eBayAPI\OAuth2API($this->environment, $this->credentials, $this->logger);
 
         return $oath2API->refreshToken($this->accessToken);
     }
 
-    public function __construct(model\Environment $environment, model\Credentials $credentials, model\AccessToken $accessToken, $logger = null) {
+    public function __construct(\eBayAPI\model\Environment $environment, \eBayAPI\model\Credentials $credentials, \eBayAPI\model\AccessToken $accessToken, $logger = null) {
         $this->environment = $environment;
         $this->credentials = $credentials;
         $this->accessToken = $accessToken;

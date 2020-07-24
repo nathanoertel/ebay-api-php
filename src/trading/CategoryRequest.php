@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace eBayAPI;
+namespace eBayAPI\trading;
 
-class CategorySOAPRequest extends AbstractSOAPRequest {
+class CategoryRequest extends AbstractRequest {
     public function getCategoryFeatures($marketplaceId, $data) {
         return parent::request('GetCategoryFeatures', $marketplaceId, $data);
     }

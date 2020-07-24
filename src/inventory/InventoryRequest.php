@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace eBayAPI;
+namespace eBayAPI\inventory;
 
 class InventoryRequest extends AbstractRequest {
     const CONDITION_ENUM = array(

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-namespace eBayAPI;
+namespace eBayAPI\inventory;
 
 abstract class AbstractRequest {
     const GET = 'GET';
@@ -134,7 +134,7 @@ abstract class AbstractRequest {
                             $notHandled = false;
                             if($this->refreshToken()) {
                                 $response = $this->request($path, $method, $data);
-                            } else $exception = new exception\AuthenticationException('Refresh token failed');
+                            } else $exception = new \eBayAPI\exception\AuthenticationException('Refresh token failed');
                             break;
                         }
                     }
@@ -151,11 +151,11 @@ abstract class AbstractRequest {
                     foreach($response['errors'] as $error) { 
                         $errors[] = $error['message'];
                     }
-                    $exception = new exception\RequestException($response['errors']);
+                    $exception = new \eBayAPI\exception\RequestException($response['errors']);
                 }
             }
 		} else {
-            $exception = new exception\RequestException(array(
+            $exception = new \eBayAPI\exception\RequestException(array(
                 array(
                     'errorId' => curl_errno($curl),
                     'message' => curl_error($curl)
@@ -174,12 +174,12 @@ abstract class AbstractRequest {
     }
 
     private function refreshToken() {
-        $oath2API = new OAuth2API($this->environment, $this->credentials, $this->logger);
+        $oath2API = new \eBayAPI\OAuth2API($this->environment, $this->credentials, $this->logger);
 
         return $oath2API->refreshToken($this->accessToken);
     }
 
-    public function __construct(model\Environment $environment, model\Credentials $credentials, model\AccessToken $accessToken, $logger = null) {
+    public function __construct(\eBayAPI\model\Environment $environment, \eBayAPI\model\Credentials $credentials, \eBayAPI\model\AccessToken $accessToken, $logger = null) {
         $this->environment = $environment;
         $this->credentials = $credentials;
         $this->accessToken = $accessToken;
