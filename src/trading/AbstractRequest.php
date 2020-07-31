@@ -22,7 +22,7 @@ abstract class AbstractRequest {
     const PUT = 'PUT';
     const DELETE = 'DELETE';
 
-    protected static $siteIDs = array(
+    const SITE_ID = array(
         'EBAY_US' => 0,
         'EBAY_CA' => 2,
         'EBAY_GB' => 3,
@@ -95,7 +95,7 @@ abstract class AbstractRequest {
         $client->__setLocation('https://'.$this->environment->getAPIEndpoint().'/wsapi?'.http_build_query(array(
             'callname' => $operation,
             'version' => $this->version,
-            'siteid' => self::$siteIDs[$marketplaceId]
+            'siteid' => self::SITE_ID[$marketplaceId]
         )));
 
         try {
