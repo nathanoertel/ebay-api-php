@@ -93,6 +93,12 @@ class ItemRequest extends AbstractRequest {
         ));
     }
 
+    public function reviseInventoryStatus($marketplaceId, $data) {
+        return parent::request('ReviseInventoryStatus', $marketplaceId, array(
+            'InventoryStatus' => $data
+        ));
+    }
+
 	private function getUTCDate($timestamp) {
 		$utcTimezone = new \DateTimeZone("UTC");
 		$timezone = new \DateTimeZone(date_default_timezone_get());

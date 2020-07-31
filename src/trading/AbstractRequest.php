@@ -108,18 +108,12 @@ abstract class AbstractRequest {
 
             return $resp;
         } catch(\SoapException $e) {
-            echo "SOAP EXCEPTION\n";
-            echo $e->getMessage()."\n";
-            echo $e->getCode()."\n";
             $this->log($client->__getLastRequestHeaders());
             $this->log($client->__getLastRequest());
             $this->log($client->__getLastResponseHeaders());
             $this->log($client->__getLastResponse());
             throw $e;
         } catch(\Exception $e) {
-            echo "EXCEPTION\n";
-            echo $e->getMessage()."\n";
-            echo $e->getCode()."\n";
             if($e->getMessage() == 'Expired IAF token.') {
                 $this->refreshToken();
                 return $this->request($operation, $marketplaceId, $data);
