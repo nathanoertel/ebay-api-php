@@ -82,7 +82,6 @@ abstract class AbstractRequest {
     protected function request($operation, $marketplaceId, $data) {
         $mode = array (
             'soap_version' => 'SOAP_1_2',
-            'cache_wsdl' => WSDL_CACHE_NONE,
             'trace' => 1,
             'stream_context' => stream_context_create(array(
                 'http' => array(
