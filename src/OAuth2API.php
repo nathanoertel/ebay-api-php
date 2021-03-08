@@ -115,13 +115,18 @@ class OAuth2API {
                 foreach($response['errors'] as $error) { 
                     $errors[] = $error['message'];
                 }
-                $error = new exception\RequestException(implode("\n", $errors));
+                $error = new exception\RequestException($response['errors'], implode("\n", $errors), $httpCode);
             } else if($httpCode != 200) {
-                $error = new exception\RequestException('Unknown Error: '.$httpCode);
+                $error = new exception\RequestException('Unknown Error: '.$httpCode, 'Unknown Error: '.$httpCode, $httpCode);
             }
 		} else {
             if($this->logger) $this->log(curl_error($curl));
-            $error = new exception\RequestException('Unknown Curl Error: '.curl_errno($curl));
+            $exception = new exception\RequestException(array(
+                array(
+                    'errorId' => curl_errno($curl),
+                    'message' => curl_error($curl)
+                )
+            ), curl_error($curl), curl_errno($curl));
 		}
 		
         curl_close($curl);

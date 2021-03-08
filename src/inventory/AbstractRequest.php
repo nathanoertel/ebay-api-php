@@ -151,7 +151,7 @@ abstract class AbstractRequest {
                     foreach($response['errors'] as $error) { 
                         $errors[] = $error['message'];
                     }
-                    $exception = new \eBayAPI\exception\RequestException($response['errors']);
+                    $exception = new \eBayAPI\exception\RequestException($response['errors'], implode("\n", $errors), $httpCode);
                 }
             }
 		} else {
@@ -160,7 +160,7 @@ abstract class AbstractRequest {
                     'errorId' => curl_errno($curl),
                     'message' => curl_error($curl)
                 )
-            ));
+            ), curl_error($curl), curl_errno($curl));
 		}
 		
         curl_close($curl);

@@ -8,7 +8,8 @@ class RequestException extends \Exception {
         return $this->errors;
     }
 
-    public function __construct($errors) {
+    public function __construct($errors, $message, $code) {
+        parent::__construct($message, $code);
         $this->errors = $errors;
     }
 }
