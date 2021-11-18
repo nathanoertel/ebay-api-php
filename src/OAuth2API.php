@@ -116,6 +116,12 @@ class OAuth2API {
                     $errors[] = $error['message'];
                 }
                 $error = new exception\RequestException($response['errors'], implode("\n", $errors), $httpCode);
+            } else if(
+                $httpCode == 400
+                && isset($response['error'])
+                && $response['error'] === 'invalid_grant'
+            ) {
+                $error = new exception\AuthenticationException($response['error_description'], $httpCode);
             } else if($httpCode != 200) {
                 $error = new exception\RequestException('Unknown Error: '.$httpCode, 'Unknown Error: '.$httpCode, $httpCode);
             }
