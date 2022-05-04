@@ -45,6 +45,7 @@ abstract class AbstractRequest {
         'EBAY_SG' => 216
     );
 
+    protected $wsdlVersion = 1255;
     protected $version = 1157;
 
     /**
@@ -93,7 +94,7 @@ abstract class AbstractRequest {
             ))
         );
 
-        $client = new \SoapClient('https://developer.ebay.com/webservices/latest/ebaysvc.wsdl', $mode);
+        $client = new \SoapClient('https://developer.ebay.com/webservices/'.$this->wsdlVersion.'/ebaysvc.wsdl', $mode);
 
         $client->__setLocation('https://'.$this->environment->getAPIEndpoint().'/wsapi?'.http_build_query(array(
             'callname' => $operation,
