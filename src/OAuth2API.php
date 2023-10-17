@@ -103,7 +103,7 @@ class OAuth2API {
                 }
             }
             
-            $response = json_decode(gzdecode($body), true);
+            $response = json_decode($this->isGzipped($headerArray) ? gzdecode($body) : $body, true);
     
 			if($this->logger) {
                 $this->log($headers);
@@ -138,6 +138,17 @@ class OAuth2API {
         curl_close($curl);
         if($error) throw $error;
         else return $response;
+    }
+    
+    private function isGzipped($headers)
+    {
+        foreach($headers as $header) {
+            if(strpos(strtolower($header), 'content-encoding:') === 0) {
+                list($_, $encoding) = explode(' ', $header);
+                return strtolower($encoding) == 'gzip';
+            }
+        }
+        return false;
     }
 
     public function __construct(model\Environment $environment, model\Credentials $credentials, $logger = null) {
