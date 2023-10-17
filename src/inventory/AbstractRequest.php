@@ -110,7 +110,7 @@ abstract class AbstractRequest {
 			
 			$headerArray = explode("\r\n", $headers);
             $httpCode = 500;
-            
+
             foreach($headerArray as $index => $header) {
                 if(strpos($header, 'HTTP/') === 0) {
                     list($httpType, $httpCode, $status) = explode(' ', $header);
@@ -120,7 +120,7 @@ abstract class AbstractRequest {
             }
             
             if(empty($body)) $response = null;
-            else $response = json_decode(gzdecode($body), true);
+            else $response = json_decode($this->isGzipped($headerArray) ? gzdecode($body) : $body, true);
 
             $this->log($headers);
             $this->log(json_encode($response));
@@ -167,6 +167,17 @@ abstract class AbstractRequest {
         
         if($exception) throw $exception;
         else return $response;
+    }
+
+    private function isGzipped($headers)
+    {
+        foreach($headers as $header) {
+            if(strpos(strtolower($header), 'content-encoding:') === 0) {
+                list($_, $encoding) = explode(' ', $header);
+                return strtolower($encoding) == 'gzip';
+            }
+        }
+        return false;
     }
 
     private function getAuthorization($path) {
