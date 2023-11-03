@@ -86,6 +86,7 @@ abstract class AbstractRequest {
             'trace' => 1,
             'stream_context' => stream_context_create(array(
                 'http' => array(
+                    'protocol_version' => 1.0,
                     'header' => 'X-EBAY-API-IAF-TOKEN: '.$this->getAuthorization()
                 ),
                 'ssl' => array(
