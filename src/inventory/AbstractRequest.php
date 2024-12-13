@@ -62,6 +62,104 @@ abstract class AbstractRequest {
         return $this->request($path, AbstractRequest::DELETE, $data);
     }
 
+    private function getHeaderArray($headers) {
+        $headerArray = explode("\r\n", $headers);
+        $result = [];
+        foreach($headerArray as $index => $header) {
+            if(strpos($header, 'HTTP/') === 0) {
+                list($httpType, $httpCode, $status) = explode(' ', $header);
+                $httpCode = intval($httpCode);
+                $result['status'] = $httpCode;
+            } else if (!empty($header)) {
+                $parts = explode(':', $header);
+                $key = array_shift($parts);
+                $value = implode(':', $parts);
+                $result[strtolower($key)] = trim($value);
+            }
+        }
+        
+        return $result;
+    }
+    
+    private function getBody($body, $headers) {
+        if(empty($body)) return null;
+
+        $readyBody = $this->isGzipped($headers) ? gzdecode($body) : $body;
+
+        if ($this->isJSON($headers)) {
+            return json_decode($readyBody, true);
+        }
+
+        return $readyBody;
+    }
+
+    private function processResponse($curl, $method, $response) {
+        if($response !== false) {
+			$headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+
+			$headerString = substr($response, 0, $headerSize);
+			$bodyString = substr($response, $headerSize);
+			
+            $headers = $this->getHeaderArray($headerString);
+            $body = $this->getBody($bodyString, $headers);
+
+            $this->log($headerString);
+            $this->log(json_encode($body));
+    
+            if(isset($body['errors'])) {
+                $notHandled = true;
+
+                if($headers['status'] == 401) {
+                    foreach($body['errors'] as $error) { 
+                        if($error['errorId'] == 1001) {
+                            $notHandled = false;
+                            if($this->refreshToken()) {
+                                return $this->request($path, $method, $data);
+                            }
+                            throw new \eBayAPI\exception\AuthenticationException('Refresh token failed');
+                        }
+                    }
+                }
+                
+                if(
+                    ($method == AbstractRequest::GET || $method == AbstractRequest::DELETE)
+                    && $headers['status'] == 404
+                ) { // if it's a lookup and it's not found return null
+                    return [
+                        'headers' => $headers,
+                        'body' => null,
+                    ];
+                }
+
+                $errors = array_map(function ($error) {
+                    return $error['message'];
+                }, $body['errors']);
+
+                throw new \eBayAPI\exception\RequestException(
+                    $response['errors'],
+                    implode("\n", $errors),
+                    $headers['status']
+                ); 
+            }
+
+            return [
+                'headers' => $headers,
+                'body' => $body,
+            ];
+		}
+
+        throw new \eBayAPI\exception\RequestException(
+            [
+                [
+                    'errorId' => curl_errno($curl),
+                    'message' => curl_error($curl)
+                ]
+            ],
+            curl_error($curl),
+            curl_errno($curl)
+        );
+    }
+
     private function request($path, $method, $data) {
 		$curl = curl_init();
 
@@ -69,7 +167,7 @@ abstract class AbstractRequest {
 		    CURLOPT_RETURNTRANSFER => 1,
 		    CURLOPT_URL => 'https://'.$this->environment->getAPIEndpoint().$path,
 		    CURLOPT_HTTPHEADER => array(
-		    	'Accept: application/json',
+		    	// 'Accept: application/json',
                 'Authorization: Bearer '.$this->getAuthorization($path),
                 'Content-Type: application/json',
                 'Accept-Encoding: application/gzip',
@@ -100,83 +198,34 @@ abstract class AbstractRequest {
 		curl_setopt_array($curl, $options);
 
         $response = curl_exec($curl);
-        $exception = null;
 
-		if($response !== false) {
-			$headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
-
-			$headers = substr($response, 0, $headerSize);
-			$body = substr($response, $headerSize);
-			
-			$headerArray = explode("\r\n", $headers);
-            $httpCode = 500;
-
-            foreach($headerArray as $index => $header) {
-                if(strpos($header, 'HTTP/') === 0) {
-                    list($httpType, $httpCode, $status) = explode(' ', $header);
-                    $httpCode = intval($httpCode);
-                    break;
-                }
-            }
-            
-            if(empty($body)) $response = null;
-            else $response = json_decode($this->isGzipped($headerArray) ? gzdecode($body) : $body, true);
-
-            $this->log($headers);
-            $this->log(json_encode($response));
-    
-            if(isset($response['errors'])) {
-                $notHandled = true;
-
-                if($httpCode == 401) {
-                    foreach($response['errors'] as $error) { 
-                        if($error['errorId'] == 1001) {
-                            $notHandled = false;
-                            if($this->refreshToken()) {
-                                $response = $this->request($path, $method, $data);
-                            } else $exception = new \eBayAPI\exception\AuthenticationException('Refresh token failed');
-                            break;
-                        }
-                    }
-                } else if(
-                    ($method == AbstractRequest::GET || $method == AbstractRequest::DELETE)
-                    && $httpCode == 404
-                ) { // if it's a lookup and it's not found return null
-                    $response = null;
-                    $notHandled = false;
-                }
-
-                if($notHandled) {
-                    $errors = array();
-                    foreach($response['errors'] as $error) { 
-                        $errors[] = $error['message'];
-                    }
-                    $exception = new \eBayAPI\exception\RequestException($response['errors'], implode("\n", $errors), $httpCode);
-                }
-            }
-		} else {
-            $exception = new \eBayAPI\exception\RequestException(array(
-                array(
-                    'errorId' => curl_errno($curl),
-                    'message' => curl_error($curl)
-                )
-            ), curl_error($curl), curl_errno($curl));
-		}
-		
-        curl_close($curl);
-        
-        if($exception) throw $exception;
-        else return $response;
+        try {
+            $result = $this->processResponse($curl, $method, $response);
+            curl_close($curl);
+            return $result;
+        } catch (Exception $e) {
+            curl_close($curl);
+            throw $e;
+        }
     }
 
     private function isGzipped($headers)
     {
-        foreach($headers as $header) {
-            if(strpos(strtolower($header), 'content-encoding:') === 0) {
-                list($_, $encoding) = explode(' ', $header);
-                return strtolower($encoding) == 'gzip';
-            }
+        if (isset($headers['content-encoding'])) {
+            $encoding = $headers['content-encoding'];
+            return strtolower($encoding) == 'gzip';
         }
+
+        return false;
+    }
+
+    private function isJSON($headers)
+    {
+        if (isset($headers['content-type'])) {
+            $type = $headers['content-type'];
+            return strtolower($type) == 'application/json';
+        }
+
         return false;
     }
 

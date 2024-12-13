@@ -18,26 +18,32 @@ namespace eBayAPI\inventory;
 
 class FulfillmentRequest extends AbstractRequest {
     public function getOrder($orderId) {
-        return parent::get('/sell/fulfillment/v1/order/'.$orderId);
+        $result = parent::get('/sell/fulfillment/v1/order/'.$orderId);
+        return $result['body'];
     }
 
     public function getOrders($parameters) {
-        return parent::get('/sell/fulfillment/v1/order', $parameters);
+        $result = parent::get('/sell/fulfillment/v1/order', $parameters);
+        return $result['body'];
     }
 
     public function issueRefund($orderId, $refund) {
-        return parent::post('/sell/fulfillment/v1/order/'.$orderId.'/issue_refund', $refund);
+        $result = parent::post('/sell/fulfillment/v1/order/'.$orderId.'/issue_refund', $refund);
+        return $result['body'];
     }
 
     public function getShippingFulfillments($orderId) {
-        return parent::get('/sell/fulfillment/v1/order/'.$orderId.'/shipping_fulfillment');
+        $result = parent::get('/sell/fulfillment/v1/order/'.$orderId.'/shipping_fulfillment');
+        return $result['body'];
     }
 
     public function getShippingFulfillment($orderId, $shippingFulfillmentId) {
-        return parent::get('/sell/fulfillment/v1/order/'.$orderId.'/shipping_fulfillment/'.$shippingFulfillmentId);
+        $result = parent::get('/sell/fulfillment/v1/order/'.$orderId.'/shipping_fulfillment/'.$shippingFulfillmentId);
+        return $result['body'];
     }
 
     public function createShippingFulfillment($orderId, $shippingFulfillment) {
-        return parent::post('/sell/fulfillment/v1/order/'.$orderId.'/shipping_fulfillment', $shippingFulfillment);
+        $result = parent::post('/sell/fulfillment/v1/order/'.$orderId.'/shipping_fulfillment', $shippingFulfillment);
+        return $result['body'];
     }
 }

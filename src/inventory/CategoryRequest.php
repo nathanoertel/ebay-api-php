@@ -18,24 +18,28 @@ namespace eBayAPI\inventory;
 
 class CategoryRequest extends AbstractRequest {
     public function getDefaultCategoryTreeId($marketplaceId) {
-        return parent::get('/commerce/taxonomy/v1/get_default_category_tree_id', array(
+        $result = parent::get('/commerce/taxonomy/v1/get_default_category_tree_id', array(
             'marketplace_id' => $marketplaceId
         ));
+        return $result['body'];
     }
 
     public function getCategoryTree($categoryTreeId) {
-        return parent::get('/commerce/taxonomy/v1/category_tree/'.$categoryTreeId);
+        $result = parent::get('/commerce/taxonomy/v1/category_tree/'.$categoryTreeId);
+        return $result['body'];
     }
 
     public function getCategorySubtree($categoryTreeId, $categoryId) {
-        return parent::get('/commerce/taxonomy/v1/category_tree/'.$categoryTreeId.'/get_category_subtree', array(
+        $result = parent::get('/commerce/taxonomy/v1/category_tree/'.$categoryTreeId.'/get_category_subtree', array(
             'category_id' => $categoryId
         ));
+        return $result['body'];
     }
 
     public function getItemAspectsForCategory($categoryTreeId, $categoryId) {
-        return parent::get('/commerce/taxonomy/v1/category_tree/'.$categoryTreeId.'/get_item_aspects_for_category', array(
+        $result = parent::get('/commerce/taxonomy/v1/category_tree/'.$categoryTreeId.'/get_item_aspects_for_category', array(
             'category_id' => $categoryId
         ));
+        return $result['body'];
     }
 }

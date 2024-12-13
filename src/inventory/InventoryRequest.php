@@ -32,88 +32,107 @@ class InventoryRequest extends AbstractRequest {
     );
 
     public function getInventoryLocations($parameters = array()) {
-        return parent::get('/sell/inventory/v1/location', $parameters);
+        $result = parent::get('/sell/inventory/v1/location', $parameters);
+        return $result['body'];
     }
 
     public function getInventoryLocation($merchantLocationKey) {
-        return parent::get('/sell/inventory/v1/location/'.$merchantLocationKey);
+        $result = parent::get('/sell/inventory/v1/location/'.$merchantLocationKey);
+        return $result['body'];
     }
 
     public function createInventoryLocation($merchantLocationKey, $locationData) {
-        return parent::post('/sell/inventory/v1/location/'.$merchantLocationKey, $locationData);
+        $result = parent::post('/sell/inventory/v1/location/'.$merchantLocationKey, $locationData);
+        return $result['body'];
     }
 
     public function updateInventoryLocation($merchantLocationKey, $locationData) {
-        return parent::post('/sell/inventory/v1/location/'.$merchantLocationKey.'/update_location_details', $locationData);
+        $result = parent::post('/sell/inventory/v1/location/'.$merchantLocationKey.'/update_location_details', $locationData);
+        return $result['body'];
     }
 
     public function createOrReplaceInventoryItem($sku, $inventoryItem) {
-        return parent::put('/sell/inventory/v1/inventory_item/'.$sku, $inventoryItem);
+        $result = parent::put('/sell/inventory/v1/inventory_item/'.$sku, $inventoryItem);
+        return $result['body'];
     }
 
     public function getInventoryItem($sku) {
-        return parent::get('/sell/inventory/v1/inventory_item/'.$sku);
+        $result = parent::get('/sell/inventory/v1/inventory_item/'.$sku);
+        return $result['body'];
     }
 
     public function getInventoryItems($limit, $offset) {
-        return parent::get('/sell/inventory/v1/inventory_item', array(
+        $result = parent::get('/sell/inventory/v1/inventory_item', array(
             'limit' => $limit,
             'offset' => $offset
         ));
+        return $result['body'];
     }
 
     public function deleteInventoryItem($sku) {
-        return parent::delete('/sell/inventory/v1/inventory_item/'.$sku);
+        $result = parent::delete('/sell/inventory/v1/inventory_item/'.$sku);
+        return $result['body'];
     }
 
     public function bulkUpdatePriceQuantity($requests) {
-        return parent::post('/sell/inventory/v1/bulk_update_price_quantity', array(
+        $result = parent::post('/sell/inventory/v1/bulk_update_price_quantity', array(
             'requests' => $requests
         ));
+        return $result['body'];
     }
 
     public function createOrReplaceInventoryItemGroup($inventoryItemGroupKey, $inventoryItemGroup) {
-        return parent::put('/sell/inventory/v1/inventory_item_group/'.$inventoryItemGroupKey, $inventoryItemGroup);
+        $result = parent::put('/sell/inventory/v1/inventory_item_group/'.$inventoryItemGroupKey, $inventoryItemGroup);
+        return $result['body'];
     }
 
     public function getInventoryItemGroup($inventoryItemGroupKey) {
-        return parent::get('/sell/inventory/v1/inventory_item_group/'.$inventoryItemGroupKey);
+        $result = parent::get('/sell/inventory/v1/inventory_item_group/'.$inventoryItemGroupKey);
+        return $result['body'];
     }
 
     public function deleteInventoryItemGroup($inventoryItemGroupKey) {
-        return parent::delete('/sell/inventory/v1/inventory_item_group/'.$inventoryItemGroupKey);
+        $result = parent::delete('/sell/inventory/v1/inventory_item_group/'.$inventoryItemGroupKey);
+        return $result['body'];
     }
 
     public function createOffer($offer) {
-        return parent::post('/sell/inventory/v1/offer', $offer);
+        $result = parent::post('/sell/inventory/v1/offer', $offer);
+        return $result['body'];
     }
 
     public function updateOffer($offerId, $offer) {
-        return parent::put('/sell/inventory/v1/offer/'.$offerId, $offer);
+        $result = parent::put('/sell/inventory/v1/offer/'.$offerId, $offer);
+        return $result['body'];
     }
 
     public function getOffers($sku, $limit, $offset) {
-        return parent::get('/sell/inventory/v1/offer', array(
+        $result = parent::get('/sell/inventory/v1/offer', array(
             'sku' => $sku,
             'limit' => $limit,
             'offset' => $offset
         ));
+        return $result['body'];
     }
 
     public function getOffer($offerId) {
-        return parent::get('/sell/inventory/v1/offer/'.$offerId);
+        $result = parent::get('/sell/inventory/v1/offer/'.$offerId);
+        return $result['body'];
     }
 
     public function publishOffer($offerId) {
-        return parent::post('/sell/inventory/v1/offer/'.$offerId.'/publish');
+        $result = parent::post('/sell/inventory/v1/offer/'.$offerId.'/publish');
+        return $result['body'];
     }
 
     public function deleteOffer($offerId) {
-        return parent::delete('/sell/inventory/v1/offer/'.$offerId);
+        $result = parent::delete('/sell/inventory/v1/offer/'.$offerId);
+        return $result['body'];
     }
 
     public function withdrawOffer($offerId) {
-        return parent::post('/sell/inventory/v1/offer/'.$offerId.'/withdraw');
+        $result = parent::post('/sell/inventory/v1/offer/'.$offerId.'/withdraw');
+        return $result['body'];
     }
 
     public function bulkMigrateListing($listingIds) {
@@ -125,8 +144,9 @@ class InventoryRequest extends AbstractRequest {
             );
         }
 
-        return parent::post('/sell/inventory/v1/bulk_migrate_listing', array(
+        $result = parent::post('/sell/inventory/v1/bulk_migrate_listing', array(
             'requests' => $request
         ));
+        return $result['body'];
     }
 }

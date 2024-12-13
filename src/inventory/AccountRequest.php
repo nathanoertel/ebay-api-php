@@ -18,20 +18,23 @@ namespace eBayAPI\inventory;
 
 class AccountRequest extends AbstractRequest {
     public function getFulfillmentPolicies($marketplaceId) {
-        return parent::get('/sell/account/v1/fulfillment_policy', array(
+        $result = parent::get('/sell/account/v1/fulfillment_policy', array(
             'marketplace_id' => $marketplaceId
         ));
+        return $result['body'];
     }
 
     public function getReturnPolicies($marketplaceId) {
-        return parent::get('/sell/account/v1/return_policy', array(
+        $result = parent::get('/sell/account/v1/return_policy', array(
             'marketplace_id' => $marketplaceId
         ));
+        return $result['body'];
     }
 
     public function getPaymentPolicies($marketplaceId) {
-        return parent::get('/sell/account/v1/payment_policy', array(
+        $result = parent::get('/sell/account/v1/payment_policy', array(
             'marketplace_id' => $marketplaceId
         ));
+        return $result['body'];
     }
 }
