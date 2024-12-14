@@ -136,7 +136,7 @@ abstract class AbstractRequest {
                 }, $body['errors']);
 
                 throw new \eBayAPI\exception\RequestException(
-                    $response['errors'],
+                    $body['errors'],
                     implode("\n", $errors),
                     $headers['status']
                 ); 
