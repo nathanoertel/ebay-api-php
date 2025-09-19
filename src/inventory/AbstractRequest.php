@@ -222,8 +222,13 @@ abstract class AbstractRequest {
     private function isJSON($headers)
     {
         if (isset($headers['content-type'])) {
-            $type = $headers['content-type'];
-            return strtolower($type) == 'application/json';
+            $type = strtolower(
+                $headers['content-type']
+            );
+            return strpos(
+                $type,
+                'application/json'
+            ) !== false;
         }
 
         return false;
