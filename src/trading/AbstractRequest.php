@@ -95,7 +95,8 @@ abstract class AbstractRequest {
             ))
         );
 
-        $client = new \SoapClient('https://developer.ebay.com/webservices/'.$this->wsdlVersion.'/ebaysvc.wsdl', $mode);
+        $wsdlPath = __DIR__.'/../wsdl/'.$this->wsdlVersion.'/ebaysvc.wsdl';
+        $client = new \SoapClient($wsdlPath, $mode);
 
         $client->__setLocation('https://'.$this->environment->getAPIEndpoint().'/wsapi?'.http_build_query(array(
             'callname' => $operation,
